@@ -45,54 +45,44 @@ async function findSuitablePack(ctx: Context, sticker: Sticker): Promise<[Sticke
 
             // The pack is suitable at this point.
             return [pack, volumeId];
-        } catch (error) {
-            console.error(error);
+        } catch (_) {
             return [null, volumeId];
         }
     }
 }
 
-// async function downloadAnimatedSticker(sticker: Sticker): Promise<null> {
-//     if (!sticker.is_animated) return null;
-
-//     const fileUrl = await bot.telegram.getFileLink(sticker.file_id);
-//     axios.get(fileUrl.href, {
-//         responseType: 
-//     });
-
-//     return null;
-// }
-
 bot.on('sticker', async (ctx) => {
     const { sticker } = ctx.message;
-
-    if (sticker.is_animated) {
-        ctx.reply('Animated stickers are not supported yet ⚠');
-        return;
-    }
 
     ctx.replyWithChatAction('typing');
     const [pack, volumeId] = await findSuitablePack(ctx, sticker);
 
-    if (pack) {
-        await ctx.addStickerToSet(pack.name, {
-            emojis: sticker.emoji ?? '🖼',
-            png_sticker: !sticker.is_animated ? sticker.file_id : undefined,
-        });
+    try {
+        if (pack) {
+            await ctx.addStickerToSet(pack.name, {
+                emojis: sticker.emoji ?? '🖼',
+                png_sticker: !sticker.is_animated ? sticker.file_id : undefined,
+                tgs_sticker: sticker.is_animated ? { url: (await ctx.telegram.getFileLink(sticker.file_id)).href } : undefined,
+            });
 
-        const packLink = formatStickerSetLink(pack);
-        ctx.replyWithHTML(`Added into ${packLink} successfully ✅\nThe sticker will take a while to show in the pack.`);
-    } else {
-        const packName = getCollectionName(ctx, volumeId);
-        const packTitle = `${ctx.from.first_name}'s collection vol. ${volumeId}`;
+            const packLink = formatStickerSetLink(pack);
+            ctx.replyWithHTML(`Added into ${packLink} successfully ✅\nThe sticker will take a while to show in the pack.`);
+        } else {
+            const packName = getCollectionName(ctx, volumeId);
+            const packTitle = `${ctx.from.first_name}'s collection vol. ${volumeId}`;
 
-        await ctx.createNewStickerSet(packName, packTitle, {
-            emojis: sticker.emoji ?? '🖼',
-            png_sticker: !sticker.is_animated ? sticker.file_id : undefined,
-        });
+            await ctx.createNewStickerSet(packName, packTitle, {
+                emojis: sticker.emoji ?? '🖼',
+                png_sticker: !sticker.is_animated ? sticker.file_id : undefined,
+                tgs_sticker: sticker.is_animated ? { url: (await ctx.telegram.getFileLink(sticker.file_id)).href } : undefined,
+            });
 
-        const packLink = `<a href="https://t.me/addstickers/${packName}">${packTitle}</a>`;
-        ctx.replyWithHTML(`Added into ${packLink} <b>(new)</b> successfully ✅`);
+            const packLink = `<a href="https://t.me/addstickers/${packName}">${packTitle}</a>`;
+            ctx.replyWithHTML(`Added into ${packLink} <b>(new)</b> successfully ✅`);
+        }
+    } catch (error) {
+        console.error(error);
+        ctx.reply('An error occured while cloning the sticker ⚠\nPlease wait a while and resend the sticker to retry.');
     }
 });
 
