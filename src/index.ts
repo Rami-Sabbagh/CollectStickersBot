@@ -67,7 +67,7 @@ function getMostSuitablePhoto(photos: PhotoSize[]): PhotoSize {
     return bestPhoto;
 }
 
-async function addStickerToCollections(ctx: Context<Update>, emojis?: string, png?: string | InputFile, tgs?: InputFile) {
+async function addStickerToCollections(ctx: Context<Update>, emojis: string, png?: string | InputFile, tgs?: InputFile) {
     if (png === undefined && tgs === undefined) throw new Error('Both PNG and TGS are undefined!');
     if (png !== undefined && tgs !== undefined) throw new Error('Both PNG and TGS are defined!');
 
@@ -79,7 +79,7 @@ async function addStickerToCollections(ctx: Context<Update>, emojis?: string, pn
     try {
         if (pack) {
             await ctx.addStickerToSet(pack.name, {
-                emojis: emojis ?? '🖼',
+                emojis: emojis,
                 png_sticker: png,
                 tgs_sticker: tgs,
             });
@@ -91,7 +91,7 @@ async function addStickerToCollections(ctx: Context<Update>, emojis?: string, pn
             const packTitle = `${ctx.from.first_name}'s collection vol. ${volumeId}`;
 
             await ctx.createNewStickerSet(packName, packTitle, {
-                emojis: emojis ?? '🖼',
+                emojis: emojis,
                 png_sticker: png,
                 tgs_sticker: tgs,
             });
@@ -130,10 +130,24 @@ bot.on('sticker', async (ctx) => {
 
     ctx.replyWithChatAction('typing');
 
-    await addStickerToCollections(ctx, sticker.emoji,
-        !sticker.is_animated ? sticker.file_id : undefined,
-        sticker.is_animated ? { url: (await ctx.telegram.getFileLink(sticker.file_id)).href } : undefined
-    );
+    if (sticker.emoji !== undefined) {
+        await addStickerToCollections(ctx, sticker.emoji,
+            !sticker.is_animated ? sticker.file_id : undefined,
+            sticker.is_animated ? { url: (await ctx.telegram.getFileLink(sticker.file_id)).href } : undefined
+        );
+    } else {
+        // The special webp sticker, needs image conversion.
+        const stickerUrl = await ctx.telegram.getFileLink(sticker.file_id);
+        const stickerResponse = await axios.get<ArrayBuffer>(stickerUrl.href, {
+            responseType: 'arraybuffer',
+            maxContentLength: 512 * 1024, // Allow 512kb maximum.
+        });
+
+        const stickerBuffer = Buffer.from(stickerResponse.data);
+        const convertedBuffer = await sharp(stickerBuffer).png().toBuffer();
+
+        await addStickerToCollections(ctx, '🖼', { source: convertedBuffer });
+    }
 });
 
 bot.command('packs', async (ctx) => {
