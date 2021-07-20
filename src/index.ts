@@ -1,8 +1,9 @@
 import axios from 'axios';
+import sharp from 'sharp';
 import dotenv from 'dotenv';
 
 import { Context, Telegraf } from 'telegraf';
-import { Sticker, StickerSet } from 'telegraf/typings/core/types/typegram';
+import { File, InputFile, PhotoSize, Sticker, StickerSet, Update } from 'telegraf/typings/core/types/typegram';
 
 dotenv.config();
 if (process.env.BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set ⚠');
@@ -30,7 +31,7 @@ function formatStickerSetLink(pack: StickerSet) {
     return `<a href="https://t.me/addstickers/${pack.name}">${pack.title}</a>`;
 }
 
-async function findSuitablePack(ctx: Context, sticker: Sticker): Promise<[StickerSet | null, number]> {
+async function findSuitablePack(ctx: Context, isAnimated: boolean): Promise<[StickerSet | null, number]> {
     for (let volumeId = 1; true; volumeId++) {
         const collectionName = getCollectionName(ctx, volumeId);
 
@@ -41,7 +42,7 @@ async function findSuitablePack(ctx: Context, sticker: Sticker): Promise<[Sticke
             if (pack.stickers.length >= (pack.is_animated ? 50 : 120)) continue;
 
             // Skip the pack if it doesn't match in type.
-            if (pack.is_animated !== sticker.is_animated) continue;
+            if (pack.is_animated !== isAnimated) continue;
 
             // The pack is suitable at this point.
             return [pack, volumeId];
@@ -51,18 +52,36 @@ async function findSuitablePack(ctx: Context, sticker: Sticker): Promise<[Sticke
     }
 }
 
-bot.on('sticker', async (ctx) => {
-    const { sticker } = ctx.message;
+function getMostSuitablePhoto(photos: PhotoSize[]): PhotoSize {
+    photos.sort((a, b) => Math.max(a.width, a.height) - Math.max(b.width, b.height));
 
-    ctx.replyWithChatAction('typing');
-    const [pack, volumeId] = await findSuitablePack(ctx, sticker);
+    let bestPhoto = photos[0];
+
+    photos.forEach((photo) => {
+        const photoLength = Math.max(photo.width, photo.height);
+        const bestLength = Math.max(bestPhoto.width, bestPhoto.height);
+
+        if (bestLength < 512 && photoLength > bestLength) bestPhoto = photo;
+    });
+
+    return bestPhoto;
+}
+
+async function addStickerToCollections(ctx: Context<Update>, emojis?: string, png?: string | InputFile, tgs?: InputFile) {
+    if (png === undefined && tgs === undefined) throw new Error('Both PNG and TGS are undefined!');
+    if (png !== undefined && tgs !== undefined) throw new Error('Both PNG and TGS are defined!');
+
+    if (!ctx.from) throw new Error("The context doesn't come from a user message!");
+
+    const isAnimated = tgs !== undefined;
+    const [pack, volumeId] = await findSuitablePack(ctx, isAnimated);
 
     try {
         if (pack) {
             await ctx.addStickerToSet(pack.name, {
-                emojis: sticker.emoji ?? '🖼',
-                png_sticker: !sticker.is_animated ? sticker.file_id : undefined,
-                tgs_sticker: sticker.is_animated ? { url: (await ctx.telegram.getFileLink(sticker.file_id)).href } : undefined,
+                emojis: emojis ?? '🖼',
+                png_sticker: png,
+                tgs_sticker: tgs,
             });
 
             const packLink = formatStickerSetLink(pack);
@@ -72,9 +91,9 @@ bot.on('sticker', async (ctx) => {
             const packTitle = `${ctx.from.first_name}'s collection vol. ${volumeId}`;
 
             await ctx.createNewStickerSet(packName, packTitle, {
-                emojis: sticker.emoji ?? '🖼',
-                png_sticker: !sticker.is_animated ? sticker.file_id : undefined,
-                tgs_sticker: sticker.is_animated ? { url: (await ctx.telegram.getFileLink(sticker.file_id)).href } : undefined,
+                emojis: emojis ?? '🖼',
+                png_sticker: png,
+                tgs_sticker: tgs,
             });
 
             const packLink = `<a href="https://t.me/addstickers/${packName}">${packTitle}</a>`;
@@ -84,6 +103,37 @@ bot.on('sticker', async (ctx) => {
         console.error(error);
         ctx.reply('An error occured while cloning the sticker ⚠\nPlease wait a while and resend the sticker to retry.');
     }
+}
+
+bot.on('photo', async (ctx) => {
+    const { photo: photos } = ctx.message;
+    const photo = getMostSuitablePhoto(photos);
+
+    ctx.replyWithChatAction('typing');
+
+    const photoUrl = await ctx.telegram.getFileLink(photo.file_id);
+    const photoResponse = await axios.get<ArrayBuffer>(photoUrl.href, {
+        responseType: 'arraybuffer',
+        maxContentLength: 512 * 1024, // Allow 512kb maximum.
+    });
+
+    const photoBuffer = Buffer.from(photoResponse.data);
+    const stickerBuffer = await sharp(photoBuffer)
+        .resize(512, 512, { fit: 'inside' })
+        .png().toBuffer();
+
+    await addStickerToCollections(ctx, '🖼', { source: stickerBuffer });
+});
+
+bot.on('sticker', async (ctx) => {
+    const { sticker } = ctx.message;
+
+    ctx.replyWithChatAction('typing');
+
+    await addStickerToCollections(ctx, sticker.emoji,
+        !sticker.is_animated ? sticker.file_id : undefined,
+        sticker.is_animated ? { url: (await ctx.telegram.getFileLink(sticker.file_id)).href } : undefined
+    );
 });
 
 bot.command('packs', async (ctx) => {
