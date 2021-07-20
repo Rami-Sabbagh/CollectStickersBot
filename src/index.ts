@@ -1,6 +1,8 @@
+import axios from 'axios';
 import dotenv from 'dotenv';
-import { Telegraf } from 'telegraf';
-import { StickerSet } from 'telegraf/typings/core/types/typegram';
+
+import { Context, Telegraf } from 'telegraf';
+import { Sticker, StickerSet } from 'telegraf/typings/core/types/typegram';
 
 dotenv.config();
 if (process.env.BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set ⚠');
@@ -15,36 +17,107 @@ bot.command('ping', (ctx) => {
     ctx.reply('Pong 🏓');
 });
 
-bot.on('sticker', (ctx) => {
-    const debugData = JSON.stringify(ctx.message.sticker, undefined, '\t')
-    ctx.replyWithMarkdownV2(`Debug:\n\`\`\`json\n${debugData}\n\`\`\``);
+function getCollectionName(ctx: Context, volumeId: number) {
+    if (!ctx.from) throw new Error("The context doesn't belong to a user!");
+
+    const { id: userId } = ctx.from;
+    const { username: botUsername } = ctx.botInfo;
+
+    return `Collection_${volumeId}_${userId}_by_${botUsername}`;
+}
+
+function formatStickerSetLink(pack: StickerSet) {
+    return `<a href="https://t.me/addstickers/${pack.name}">${pack.title}</a>`;
+}
+
+async function findSuitablePack(ctx: Context, sticker: Sticker): Promise<[StickerSet | null, number]> {
+    for (let volumeId = 1; true; volumeId++) {
+        const collectionName = getCollectionName(ctx, volumeId);
+
+        try {
+            const pack = await ctx.telegram.getStickerSet(collectionName);
+
+            // Skip the pack if it's filled to it's limit
+            if (pack.stickers.length >= (pack.is_animated ? 50 : 120)) continue;
+
+            // Skip the pack if it doesn't match in type.
+            if (pack.is_animated !== sticker.is_animated) continue;
+
+            // The pack is suitable at this point.
+            return [pack, volumeId];
+        } catch (error) {
+            console.error(error);
+            return [null, volumeId];
+        }
+    }
+}
+
+// async function downloadAnimatedSticker(sticker: Sticker): Promise<null> {
+//     if (!sticker.is_animated) return null;
+
+//     const fileUrl = await bot.telegram.getFileLink(sticker.file_id);
+//     axios.get(fileUrl.href, {
+//         responseType: 
+//     });
+
+//     return null;
+// }
+
+bot.on('sticker', async (ctx) => {
+    const { sticker } = ctx.message;
+
+    if (sticker.is_animated) {
+        ctx.reply('Animated stickers are not supported yet ⚠');
+        return;
+    }
+
+    ctx.replyWithChatAction('typing');
+    const [pack, volumeId] = await findSuitablePack(ctx, sticker);
+
+    if (pack) {
+        await ctx.addStickerToSet(pack.name, {
+            emojis: sticker.emoji ?? '🖼',
+            png_sticker: !sticker.is_animated ? sticker.file_id : undefined,
+        });
+
+        const packLink = formatStickerSetLink(pack);
+        ctx.replyWithHTML(`Added into ${packLink} successfully ✅\nThe sticker will take a while to show in the pack.`);
+    } else {
+        const packName = getCollectionName(ctx, volumeId);
+        const packTitle = `${ctx.from.first_name}'s collection vol. ${volumeId}`;
+
+        await ctx.createNewStickerSet(packName, packTitle, {
+            emojis: sticker.emoji ?? '🖼',
+            png_sticker: !sticker.is_animated ? sticker.file_id : undefined,
+        });
+
+        const packLink = `<a href="https://t.me/addstickers/${packName}">${packTitle}</a>`;
+        ctx.replyWithHTML(`Added into ${packLink} <b>(new)</b> successfully ✅`);
+    }
 });
 
 bot.command('packs', async (ctx) => {
     const packs: StickerSet[] = [];
 
-    const { id: userId } = ctx.from;
-    const { username: botUsername } = ctx.botInfo;
-
     ctx.replyWithChatAction('typing');
 
-    let volumesId = 0;
+    let volumeId = 0;
     while (true) {
         try {
-            const pack = await ctx.telegram.getStickerSet(`Collection_${++volumesId}_${userId}_by_${botUsername}`);
+            const collectionName = getCollectionName(ctx, ++volumeId);
+            const pack = await ctx.telegram.getStickerSet(collectionName);
             packs.push(pack);
-        } catch (error) {
-            console.error('Error while fetching packs list', error);
+        } catch (_) {
             break;
         }
     }
 
-    const list = packs.map((pack) => `[${pack.title}](https://t.me/addstickers/${pack.name})`).join('\n');
-    
+    const list = packs.map(formatStickerSetLink).join('\n');
+
     if (packs.length === 0) {
         ctx.reply('No packs were found ⚠');
     } else {
-        ctx.replyWithMarkdownV2(list);
+        ctx.replyWithHTML(list);
     }
 });
 
