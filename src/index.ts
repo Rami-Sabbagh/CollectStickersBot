@@ -24,6 +24,11 @@ bot.use(async (ctx, next) => {
     await next();
 });
 
+bot.on('my_chat_member', async (ctx, next) => {
+    await ctx.profile.setBlocked(ctx.myChatMember.new_chat_member.status === 'kicked');
+    await next();
+});
+
 bot.start((ctx) => {
     ctx.reply('🚧 The bot is being rewritten 🚧');
 });
