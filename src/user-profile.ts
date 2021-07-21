@@ -23,7 +23,13 @@ export default class UserProfile {
     }
 
     async setBlocked(value: boolean) {
-        await redis.hset(this.key, 'blocked', value ? 'true' : 'false');
+        if (value)
+            await redis.pipeline()
+                .hset(this.key, 'blocked', 'true')
+                .hincrby(this.key, 'blocked_times', 1)
+                .exec();
+        else
+            await redis.hdel(this.key, 'blocked');
     }
 
     async setLanguage(value: Language) {
