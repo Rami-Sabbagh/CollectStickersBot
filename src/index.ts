@@ -5,10 +5,24 @@ import dotenv from 'dotenv';
 import { Context, Telegraf } from 'telegraf';
 import { InputFile, PhotoSize, StickerSet, Update } from 'telegraf/typings/core/types/typegram';
 
+import redis from './redis';
+import UserProfile from './user-profile';
+
 dotenv.config();
 if (process.env.BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set ⚠');
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+interface MyContext extends Context {
+    profile: UserProfile
+}
+
+const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN);
+
+bot.use(async (ctx, next) => {
+    if (ctx.from) ctx.profile = await UserProfile.of(ctx.from);
+    else ctx.profile = UserProfile.invalid;
+
+    await next();
+});
 
 bot.start((ctx) => {
     ctx.reply('🚧 The bot is being rewritten 🚧');
@@ -16,6 +30,10 @@ bot.start((ctx) => {
 
 bot.command('ping', (ctx) => {
     ctx.reply('Pong 🏓');
+});
+
+bot.command('profile', async (ctx) => {
+    ctx.replyWithHTML(`<pre>${JSON.stringify(ctx.profile, undefined, '\t')}</pre>`);
 });
 
 function getCollectionName(ctx: Context, volumeId: number) {
@@ -123,6 +141,7 @@ bot.on('photo', async (ctx) => {
         .png().toBuffer();
 
     await addStickerToCollections(ctx, '🖼', { source: stickerBuffer });
+    await ctx.profile.incrementStickersCount('image');
 });
 
 bot.on('sticker', async (ctx) => {
@@ -148,6 +167,8 @@ bot.on('sticker', async (ctx) => {
 
         await addStickerToCollections(ctx, '🖼', { source: convertedBuffer });
     }
+
+    await ctx.profile.incrementStickersCount(sticker.is_animated ? 'animated' : 'static');
 });
 
 bot.command('packs', async (ctx) => {
@@ -175,9 +196,10 @@ bot.command('packs', async (ctx) => {
     }
 });
 
-bot.command('stop', (ctx) => {
+bot.command('stop', async (ctx) => {
     ctx.reply('It was nice to serve you sir 😊');
     bot.stop(`Requested by ${ctx.from.id}`);
+    await redis.quit();
 });
 
 bot.launch({ allowedUpdates: ['message', 'callback_query', 'my_chat_member'] });
