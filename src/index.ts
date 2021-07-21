@@ -180,7 +180,7 @@ bot.command('stop', (ctx) => {
     bot.stop(`Requested by ${ctx.from.id}`);
 });
 
-bot.launch();
+bot.launch({ allowedUpdates: ['message', 'callback_query', 'my_chat_member'] });
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
