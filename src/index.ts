@@ -19,7 +19,7 @@ const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN);
 
 bot.use(async (ctx, next) => {
     if (ctx.from) ctx.profile = await UserProfile.of(ctx.from);
-    else ctx.profile = UserProfile.invalid;
+    else ctx.profile = UserProfile.unknown;
 
     await next();
 });
@@ -33,7 +33,7 @@ bot.command('ping', (ctx) => {
 });
 
 bot.command('profile', async (ctx) => {
-    ctx.replyWithHTML(`<pre>${JSON.stringify(ctx.profile, undefined, '\t')}</pre>`);
+    ctx.replyWithHTML(`<pre>${JSON.stringify(await redis.hgetall(`user:${ctx.from.id}`), undefined, '\t')}</pre>`);
 });
 
 function getCollectionName(ctx: Context, volumeId: number) {
