@@ -3,7 +3,7 @@ import sharp from 'sharp';
 import dotenv from 'dotenv';
 
 import { Context, Telegraf } from 'telegraf';
-import { File, InputFile, PhotoSize, Sticker, StickerSet, Update } from 'telegraf/typings/core/types/typegram';
+import { InputFile, PhotoSize, StickerSet, Update } from 'telegraf/typings/core/types/typegram';
 
 dotenv.config();
 if (process.env.BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set ⚠');
