@@ -201,13 +201,17 @@ bot.command('packs', async (ctx) => {
     }
 });
 
+function stop(reason?: string) {
+    bot.stop(reason);
+    redis.quit().catch(console.error);
+}
+
 bot.command('stop', async (ctx) => {
-    ctx.reply('It was nice to serve you sir 😊');
-    bot.stop(`Requested by ${ctx.from.id}`);
-    await redis.quit();
+    await ctx.reply('It was nice to serve you sir 😊');
+    stop(`Requested by ${ctx.from.id}`);
 });
 
 bot.launch({ allowedUpdates: ['message', 'callback_query', 'my_chat_member'] });
 
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+process.once('SIGINT', () => stop('SIGINT'));
+process.once('SIGTERM', () => stop('SIGTERM'));
