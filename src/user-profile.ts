@@ -62,10 +62,13 @@ export default class UserProfile {
 
         // Update the values in the database.
         const pipeline = redis.multi();
+
         if (Object.entries(toSet).length !== 0) pipeline.hmset(key, toSet);
         if (toClear.length !== 0) pipeline.hdel(key, ...toClear);
-        await pipeline.exec();
 
+        pipeline.sadd('users', user.id);
+
+        await pipeline.exec();
         return new UserProfile(user.id);
     }
 }
