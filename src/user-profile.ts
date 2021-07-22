@@ -71,6 +71,7 @@ export default class UserProfile {
             last_name: user.last_name,
             user_name: user.username,
             language_code: user.language_code,
+            last_used: `${Date.now()}`,
         };
 
         const toSet: Record<string, string> = {};
