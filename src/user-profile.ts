@@ -83,6 +83,8 @@ export default class UserProfile {
             else toSet[field] = value;
         });
 
+        if (!(await redis.hexists(key, 'first_used'))) toSet['first_used'] = `${Date.now()}`;
+
         // Update the values in the database.
         const pipeline = redis.multi();
 
