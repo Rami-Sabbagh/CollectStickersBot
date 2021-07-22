@@ -3,7 +3,6 @@ services:
   bot:
     build: .
     env_file: .env
-    restart: on-failure:5
     environment:
       REDIS_URL: "redis://redis:6379"
     depends_on:
