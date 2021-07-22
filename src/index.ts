@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+dotenv.config();
+
 import { Context, Telegraf } from 'telegraf';
 
 import redis from './redis';
@@ -6,12 +8,11 @@ import UserProfile from './user-profile';
 
 import { cloneSticker, createStickerFromImage, findPacksLinksForUser } from './stickers-utils';
 
-dotenv.config();
-if (process.env.BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set ⚠');
-
 interface MyContext extends Context {
     profile: UserProfile
 }
+
+if (process.env.BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set ⚠');
 
 const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN);
 
