@@ -26,6 +26,14 @@ async function sendLanguagesMenu(ctx: MyContext) {
     });
 }
 
+async function increaseStickersCounter(type: 'static' | 'animated' | 'image') {
+    return redis.incr(`${type}_stickers`);
+}
+
+async function increaseCommandCounter(command: string) {
+    return redis.hincrby('commands_usage', command, 1);
+}
+
 bot.use(async (ctx, next) => {
     if (ctx.from) ctx.profile = await UserProfile.of(ctx.from);
     else ctx.profile = UserProfile.unknown;
@@ -46,7 +54,7 @@ bot.on('my_chat_member', async (ctx, next) => {
 bot.on('callback_query', async (ctx, next) => {
     const data = ((ctx.callbackQuery as any).data as string | undefined);
     const { message } = ctx.callbackQuery;
-    
+
     if (data && data.length <= 64 && data.startsWith('set_language:')) {
         const languageCode = data.substring('set_language:'.length);
 
@@ -64,13 +72,19 @@ bot.on('callback_query', async (ctx, next) => {
     await next();
 });
 
-bot.start(sendLanguagesMenu);
+bot.start(async (ctx) => {
+    await increaseCommandCounter('start');
+    await sendLanguagesMenu(ctx);
+});
 
 bot.help(async (ctx) => {
     await ctx.reply(ctx.localize('basic_help'));
 });
 
-bot.command('language', sendLanguagesMenu);
+bot.command('language', async (ctx) => {
+    await increaseCommandCounter('language');
+    await sendLanguagesMenu(ctx);
+});
 
 bot.on('photo', async (ctx) => {
     await ctx.replyWithChatAction('typing');
@@ -85,6 +99,7 @@ bot.on('photo', async (ctx) => {
         else if (result.type === 'existing_pack') response = ctx.localize('stickers_add_success', { pack_link: result.packLink });
 
         await ctx.profile.incrementStickersCount('image');
+        await increaseStickersCounter('image');
     } catch (error) {
         console.error(error);
         response = ctx.localize('sticker_image_failure');
@@ -106,6 +121,7 @@ bot.on('sticker', async (ctx) => {
         else if (result.type === 'existing_pack') response = ctx.localize('stickers_add_success', { pack_link: result.packLink });
 
         await ctx.profile.incrementStickersCount(sticker.is_animated ? 'animated' : 'static');
+        await increaseStickersCounter(sticker.is_animated ? 'animated' : 'static');
     } catch (error) {
         console.error(error);
         response = ctx.localize('stickers_add_failure');
@@ -116,6 +132,8 @@ bot.on('sticker', async (ctx) => {
 
 bot.command('packs', async (ctx) => {
     await ctx.replyWithChatAction('typing');
+    await increaseCommandCounter('packs');
+
     const packs = await findPacksLinksForUser(ctx);
 
     if (packs.length === 0) await ctx.reply(ctx.localize('stickers_list_empty'));
@@ -125,8 +143,9 @@ bot.command('packs', async (ctx) => {
     }));
 });
 
-bot.command('ping', (ctx) => {
-    ctx.reply('Pong 🏓');
+bot.command('ping', async (ctx) => {
+    await increaseCommandCounter('ping');
+    await ctx.reply('Pong 🏓');
 });
 
 if (process.env.DEBUG === 'true') {
