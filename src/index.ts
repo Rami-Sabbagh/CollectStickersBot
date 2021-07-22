@@ -20,12 +20,20 @@ if (process.env.BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set
 
 const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN);
 
+async function sendLanguagesMenu(ctx: MyContext) {
+    await ctx.reply(ctx.localize('language_select'), {
+        reply_markup: localization.languagesKeyboard(),
+    });
+}
+
 bot.use(async (ctx, next) => {
     if (ctx.from) ctx.profile = await UserProfile.of(ctx.from);
     else ctx.profile = UserProfile.unknown;
 
-    const language_code = await ctx.profile.getLanguage();
-    ctx.localize = (string_id, view) => localization.localize(language_code, string_id, view);
+    ctx.localize = (string_id, view) => {
+        const language_code = ctx.profile.getLanguage();
+        return localization.localize(language_code, string_id, view);
+    }
 
     await next();
 });
@@ -35,13 +43,34 @@ bot.on('my_chat_member', async (ctx, next) => {
     await next();
 });
 
-bot.start(async (ctx) => {
-    await ctx.reply('🚧 The bot is being rewritten 🚧');
+bot.on('callback_query', async (ctx, next) => {
+    const data = ((ctx.callbackQuery as any).data as string | undefined);
+    const { message } = ctx.callbackQuery;
+    
+    if (data && data.length <= 64 && data.startsWith('set_language:')) {
+        const languageCode = data.substring('set_language:'.length);
+
+        if (localization.isValidLanguage(languageCode)) {
+            await ctx.profile.setLanguage(languageCode);
+            await ctx.answerCbQuery(ctx.localize('language_selected'));
+
+            if (message) await ctx.deleteMessage(message.message_id).catch(console.error);
+            ctx.reply(ctx.localize('basic_help'));
+        }
+
+        return;
+    }
+
+    await next();
 });
+
+bot.start(sendLanguagesMenu);
 
 bot.help(async (ctx) => {
     await ctx.reply(ctx.localize('basic_help'));
 });
+
+bot.command('language', sendLanguagesMenu);
 
 bot.on('photo', async (ctx) => {
     await ctx.replyWithChatAction('typing');

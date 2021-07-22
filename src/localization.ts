@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import Mustache from 'mustache';
 import { parse } from 'fast-csv';
+import { InlineKeyboardButton, InlineKeyboardMarkup } from 'telegraf/typings/core/types/typegram';
 
 const localizationPath = path.resolve('./localization.csv');
 
@@ -37,4 +38,16 @@ export function localize(language_code: string, string_id: string, view?: Record
     if (!localization_string) return `<pre>${string_id.toUpperCase()}</pre>`;
 
     return Mustache.render(localization_string, view);
+}
+
+export function isValidLanguage(languageCode: string): boolean {
+    return localization['language_title']?.[languageCode] !== undefined;
+}
+
+export function languagesKeyboard(): InlineKeyboardMarkup {
+    const keyboard: InlineKeyboardButton[][] = Object.entries(localization['language_title'] ?? {})
+        .filter(([key, value]) => key !== 'id' && key !== '' && value !== undefined)
+        .map(([code, title]) => [{ text: title as string, callback_data: `set_language:${code}` }]);
+
+    return { inline_keyboard: keyboard };
 }
