@@ -78,6 +78,7 @@ bot.start(async (ctx) => {
 });
 
 bot.help(async (ctx) => {
+    await increaseCommandCounter('help');
     await ctx.reply(ctx.localize('basic_help'));
 });
 
