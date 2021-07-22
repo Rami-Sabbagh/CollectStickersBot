@@ -35,8 +35,12 @@ bot.on('my_chat_member', async (ctx, next) => {
     await next();
 });
 
-bot.start((ctx) => {
-    ctx.reply('🚧 The bot is being rewritten 🚧');
+bot.start(async (ctx) => {
+    await ctx.reply('🚧 The bot is being rewritten 🚧');
+});
+
+bot.help(async (ctx) => {
+    await ctx.reply(ctx.localize('basic_help'));
 });
 
 bot.on('photo', async (ctx) => {
@@ -48,13 +52,13 @@ bot.on('photo', async (ctx) => {
     try {
         const result = await createStickerFromImage(ctx, photos);
 
-        if (result.type === 'new_pack') response = `Added into ${result.packLink} <b>(new)</b> successfully ✅`;
-        else if (result.type === 'existing_pack') response = `Added into ${result.packLink} successfully ✅\nThe sticker will take a while to show in the pack.`;
+        if (result.type === 'new_pack') response = ctx.localize('stickers_add_success_new', { pack_link: result.packLink });
+        else if (result.type === 'existing_pack') response = ctx.localize('stickers_add_success', { pack_link: result.packLink });
 
         await ctx.profile.incrementStickersCount('image');
     } catch (error) {
         console.error(error);
-        response = 'An error occured while cloning the sticker ⚠\nPlease wait a while and resend the sticker to retry.';
+        response = ctx.localize('sticker_image_failure');
     }
 
     await ctx.replyWithHTML(response);
@@ -69,13 +73,13 @@ bot.on('sticker', async (ctx) => {
     try {
         const result = await cloneSticker(ctx, sticker);
 
-        if (result.type === 'new_pack') response = `Added into ${result.packLink} <b>(new)</b> successfully ✅`;
-        else if (result.type === 'existing_pack') response = `Added into ${result.packLink} successfully ✅\nThe sticker will take a while to show in the pack.`;
+        if (result.type === 'new_pack') response = ctx.localize('stickers_add_success_new', { pack_link: result.packLink });
+        else if (result.type === 'existing_pack') response = ctx.localize('stickers_add_success', { pack_link: result.packLink });
 
         await ctx.profile.incrementStickersCount(sticker.is_animated ? 'animated' : 'static');
     } catch (error) {
         console.error(error);
-        response = 'An error occured while cloning the sticker ⚠\nPlease wait a while and resend the sticker to retry.';
+        response = ctx.localize('stickers_add_failure');
     }
 
     await ctx.replyWithHTML(response);
