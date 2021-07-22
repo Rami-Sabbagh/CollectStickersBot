@@ -8,6 +8,7 @@ import redis from './redis';
 export default class UserProfile {
     /**
      * @param id The Telegram id of the user.
+     * @param language The localization langauge of the user.
      */
     protected constructor(
         public readonly id: number,
