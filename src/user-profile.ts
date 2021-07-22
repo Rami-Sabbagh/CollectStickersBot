@@ -1,4 +1,5 @@
 import { User } from 'telegraf/typings/core/types/typegram';
+import { isValidLanguage } from './localization';
 import redis from './redis';
 
 /**
@@ -8,7 +9,10 @@ export default class UserProfile {
     /**
      * @param id The Telegram id of the user.
      */
-    protected constructor(public readonly id: number) { }
+    protected constructor(
+        public readonly id: number,
+        protected language: string,
+    ) { }
 
     /**
      * The database key of the user's hash.
@@ -18,9 +22,7 @@ export default class UserProfile {
     /**
      * Get the language configured for the user to interact with the bot using.
      */
-    async getLanguage(): Promise<string> {
-        return await redis.hget(this.key, 'language') ?? 'en';
-    }
+    getLanguage(): string { return this.language; }
 
     /**
      * Update whether the user has the bot blocked or not.
@@ -40,6 +42,7 @@ export default class UserProfile {
      */
     async setLanguage(value: string) {
         await redis.hset(this.key, 'language', value);
+        this.language = value;
     }
 
     /**
@@ -52,7 +55,7 @@ export default class UserProfile {
     /**
      * A shared instance that represents an unknown/invalid user.
      */
-    static readonly unknown = new UserProfile(0);
+    static readonly unknown = new UserProfile(0, 'en');
 
     /**
      * Loads/Creates and updates a user profile from the database.
@@ -87,6 +90,12 @@ export default class UserProfile {
         pipeline.sadd('users', user.id);
 
         await pipeline.exec();
-        return new UserProfile(user.id);
+
+        const language = await redis.hget(key, 'language');
+        const osLanguage = user.language_code;
+
+        if (language) return new UserProfile(user.id, language);
+        else if (osLanguage && isValidLanguage(osLanguage)) return new UserProfile(user.id, osLanguage);
+        else return new UserProfile(user.id, 'en');
     }
 }
