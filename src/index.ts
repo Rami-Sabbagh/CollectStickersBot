@@ -32,14 +32,6 @@ bot.start((ctx) => {
     ctx.reply('🚧 The bot is being rewritten 🚧');
 });
 
-bot.command('ping', (ctx) => {
-    ctx.reply('Pong 🏓');
-});
-
-bot.command('profile', async (ctx) => {
-    ctx.replyWithHTML(`<pre>${JSON.stringify(await redis.hgetall(`user:${ctx.from.id}`), undefined, '\t')}</pre>`);
-});
-
 bot.on('photo', async (ctx) => {
     await ctx.replyWithChatAction('typing');
     const { photo: photos } = ctx.message;
@@ -57,7 +49,7 @@ bot.on('photo', async (ctx) => {
         console.error(error);
         response = 'An error occured while cloning the sticker ⚠\nPlease wait a while and resend the sticker to retry.';
     }
-    
+
     await ctx.replyWithHTML(response);
 });
 
@@ -90,15 +82,29 @@ bot.command('packs', async (ctx) => {
     else await ctx.replyWithHTML(packs.join('\n'));
 });
 
+bot.command('ping', (ctx) => {
+    ctx.reply('Pong 🏓');
+});
+
+if (process.env.DEBUG === 'true') {
+    bot.command('chatid', async (ctx) => {
+        ctx.replyWithHTML(`Chat id: <pre>${ctx.chat.id}</pre>`);
+    });
+
+    bot.command('profile', async (ctx) => {
+        ctx.replyWithHTML(`<pre>${JSON.stringify(await redis.hgetall(`user:${ctx.from.id}`), undefined, '\t')}</pre>`);
+    });
+
+    bot.command('stop', async (ctx) => {
+        await ctx.reply('It was nice to serve you sir 😊');
+        stop(`Requested by ${ctx.from.id}`);
+    });
+}
+
 function stop(reason?: string) {
     bot.stop(reason);
     redis.quit().catch(console.error);
 }
-
-bot.command('stop', async (ctx) => {
-    await ctx.reply('It was nice to serve you sir 😊');
-    stop(`Requested by ${ctx.from.id}`);
-});
 
 bot.launch({ allowedUpdates: ['message', 'callback_query', 'my_chat_member'] });
 
