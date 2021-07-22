@@ -26,15 +26,15 @@ export async function load() {
             headers: true,
             ignoreEmpty: true,
         }))
-            .on('data', (entry: LocalizationEntry) => localization[entry.id] = entry)
+            .on('data', (entry: LocalizationEntry) => localization[entry.id.toLowerCase()] = entry)
             .on('error', reject)
             .on('end', resolve);
     });
 }
 
-export function localize(language_code: string, string_id: string, view: Record<string, string>): string {
-    const localization_string = localization[string_id]?.[language_code];
-    if (!localization_string) return `${string_id.toUpperCase()}: ${JSON.stringify(view)}`;
+export function localize(language_code: string, string_id: string, view?: Record<string, any>): string {
+    const localization_string = localization[string_id.toLowerCase()]?.[language_code];
+    if (!localization_string) return `<pre>${string_id.toUpperCase()}</pre>`;
 
     return Mustache.render(localization_string, view);
 }
