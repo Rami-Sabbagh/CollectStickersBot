@@ -13,7 +13,7 @@ import { cloneSticker, createStickerFromImage, findPacksLinksForUser } from './s
 
 interface MyContext extends Context {
     profile: UserProfile;
-    localize(string_id: string, view: Record<string, string>): string;
+    localize(string_id: string, view?: Record<string, any>): string;
 }
 
 if (process.env.BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set ⚠');
@@ -85,8 +85,11 @@ bot.command('packs', async (ctx) => {
     await ctx.replyWithChatAction('typing');
     const packs = await findPacksLinksForUser(ctx);
 
-    if (packs.length === 0) await ctx.reply('No packs were found ⚠');
-    else await ctx.replyWithHTML(packs.join('\n'));
+    if (packs.length === 0) await ctx.reply(ctx.localize('stickers_list_empty'));
+    else await ctx.replyWithHTML(ctx.localize('stickers_list_success', {
+        count: packs.length,
+        packs_links: packs,
+    }));
 });
 
 bot.command('ping', (ctx) => {
