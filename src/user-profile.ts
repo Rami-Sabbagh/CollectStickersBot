@@ -1,11 +1,9 @@
 import { User } from 'telegraf/typings/core/types/typegram';
 import redis from './redis';
 
-export const enum Language {
-    ENGLISH = 'en',
-    ARABIC = 'ar',
-}
-
+/**
+ * Represents the database stored profile of the user.
+ */
 export default class UserProfile {
     /**
      * @param id The Telegram id of the user.
@@ -17,11 +15,16 @@ export default class UserProfile {
      */
     protected get key(): string { return `user:${this.id}`; }
 
-    async getLanguage(): Promise<Language> {
-        const language = await redis.hget(this.key, 'language');
-        return (language ?? Language.ENGLISH) as Language;
+    /**
+     * Get the language configured for the user to interact with the bot using.
+     */
+    async getLanguage(): Promise<string> {
+        return await redis.hget(this.key, 'language') ?? 'en';
     }
 
+    /**
+     * Update whether the user has the bot blocked or not.
+     */
     async setBlocked(value: boolean) {
         if (value)
             await redis.pipeline()
@@ -32,14 +35,23 @@ export default class UserProfile {
             await redis.hdel(this.key, 'blocked');
     }
 
-    async setLanguage(value: Language) {
+    /**
+     * Set the language for the user to interact with the bot using.
+     */
+    async setLanguage(value: string) {
         await redis.hset(this.key, 'language', value);
     }
 
+    /**
+     * Increment the processed stickers counter for the user.
+     */
     async incrementStickersCount(type: 'static' | 'animated' | 'image') {
         await redis.hincrby(this.key, `${type}_stickers`, 1);
     }
 
+    /**
+     * A shared instance that represents an unknown/invalid user.
+     */
     static readonly unknown = new UserProfile(0);
 
     /**
