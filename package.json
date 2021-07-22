@@ -1,6 +1,6 @@
 {
   "name": "collect-stickers-bot",
-  "version": "0.0.0",
+  "version": "1.8.0",
   "description": "A Telegram bot for cloning stickers into your own stickers packs (collections).",
   "main": "src/index.ts",
   "repository": "https://github.com/Rami-Sabbagh/CollectStickersBot.git",
