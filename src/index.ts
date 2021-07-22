@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -6,10 +7,13 @@ import { Context, Telegraf } from 'telegraf';
 import redis from './redis';
 import UserProfile from './user-profile';
 
+import * as localization from './localization';
+
 import { cloneSticker, createStickerFromImage, findPacksLinksForUser } from './stickers-utils';
 
 interface MyContext extends Context {
-    profile: UserProfile
+    profile: UserProfile;
+    localize(string_id: string, view: Record<string, string>): string;
 }
 
 if (process.env.BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set ⚠');
@@ -19,6 +23,9 @@ const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN);
 bot.use(async (ctx, next) => {
     if (ctx.from) ctx.profile = await UserProfile.of(ctx.from);
     else ctx.profile = UserProfile.unknown;
+
+    const language_code = await ctx.profile.getLanguage();
+    ctx.localize = (string_id, view) => localization.localize(language_code, string_id, view);
 
     await next();
 });
@@ -102,11 +109,24 @@ if (process.env.DEBUG === 'true') {
 }
 
 function stop(reason?: string) {
-    bot.stop(reason);
     redis.quit().catch(console.error);
+    bot.stop(reason);
 }
 
-bot.launch({ allowedUpdates: ['message', 'callback_query', 'my_chat_member'] });
+async function start() {
+    process.once('SIGINT', () => stop('SIGINT'));
+    process.once('SIGTERM', () => stop('SIGTERM'));
 
-process.once('SIGINT', () => stop('SIGINT'));
-process.once('SIGTERM', () => stop('SIGTERM'));
+    const info = chalk.blueBright;
+
+    console.info(info('> Connecting to Redis database...'));
+    await redis.ping();
+    console.info(info('> Loading localization data...'));
+    await localization.load();
+    console.info(info('> Launching the bot...'));
+    await bot.launch({ allowedUpdates: ['message', 'callback_query', 'my_chat_member'] });
+
+    console.info(chalk.greenBright('> Ready ✔'));
+}
+
+start().catch(console.error);
