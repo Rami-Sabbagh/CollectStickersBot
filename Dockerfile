@@ -1,4 +1,6 @@
-FROM node:14-alpine
+##### Base #####
+
+FROM node:14-alpine as base
 
 WORKDIR /app
 
@@ -6,12 +8,33 @@ WORKDIR /app
 COPY package.json ./
 COPY yarn.lock ./
 
-# Install dependencies
+# Install production dependencies
 RUN yarn install --production
 
-# Copy the project artifact
+##### BUILD #####
+
+FROM base as build
+
+WORKDIR /app
+
+# Install all the dependencies
+RUN yarn
+
+# Copy the source-code
+COPY . .
+
+# Build the project
+RUN yarn build
+
+##### PRODUCTION IMAGE #####
+
+FROM base
+
+WORKDIR /app
+
+# Copy the required files to run the project
 COPY localization.csv README.md ./
-COPY dist dist
+COPY --from=build /app/dist dist
 
 # Launch the bot
 CMD [ "yarn", "start" ]
