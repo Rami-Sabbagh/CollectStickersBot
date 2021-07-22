@@ -105,7 +105,7 @@ interface StickerAdditionResult {
  * 
  * @throws If the addition failed to some reason (connection issues, api errors, ...).
  */
-async function addStickerToCollections(ctx: Context<Update>, emojis: string, png?: string | InputFile, tgs?: InputFile): Promise<StickerAdditionResult> {
+async function addStickerToCollections(ctx: Context, emojis: string, png?: string | InputFile, tgs?: InputFile): Promise<StickerAdditionResult> {
     if (png === undefined && tgs === undefined) throw new Error('Both PNG and TGS are undefined!');
     if (png !== undefined && tgs !== undefined) throw new Error('Both PNG and TGS are defined!');
 
@@ -142,7 +142,7 @@ async function addStickerToCollections(ctx: Context<Update>, emojis: string, png
  * @param sticker The sticker to clones.
  * @returns The sticker addition to collections result.
  */
-export async function cloneSticker(ctx: Context<Update>, sticker: Sticker): Promise<StickerAdditionResult> {
+export async function cloneSticker(ctx: Context, sticker: Sticker): Promise<StickerAdditionResult> {
     if (sticker.emoji !== undefined) {
         return addStickerToCollections(ctx, sticker.emoji,
             !sticker.is_animated ? sticker.file_id : undefined,
@@ -170,7 +170,7 @@ export async function cloneSticker(ctx: Context<Update>, sticker: Sticker): Prom
  * @param photos The list of available photo sizes of the image to use.
  * @returns The sticker addition to collections result.
  */
-export async function createStickerFromImage(ctx: Context<Update>, photos: PhotoSize[]): Promise<StickerAdditionResult> {
+export async function createStickerFromImage(ctx: Context, photos: PhotoSize[]): Promise<StickerAdditionResult> {
     const photo = findMostSuitablePhoto(photos);
 
     // Download the suitable photo.
@@ -194,7 +194,7 @@ export async function createStickerFromImage(ctx: Context<Update>, photos: Photo
  * @param ctx A Telegram context of an update which belongs to the user.
  * @returns A list of HTML formatted links for the user's collections packs.
  */
-export async function findPacksLinksForUser(ctx: Context<Update>): Promise<string[]> {
+export async function findPacksLinksForUser(ctx: Context): Promise<string[]> {
     const packs: StickerSet[] = [];
 
     let volumeId = 0;
