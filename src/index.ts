@@ -27,7 +27,7 @@ async function sendLanguagesMenu(ctx: MyContext) {
 }
 
 async function increaseStickersCounter(type: 'static' | 'animated' | 'image') {
-    return redis.incr(`${type}_stickers`);
+    return redis.hincrby('stickers_usage', type, 1);
 }
 
 async function increaseCommandCounter(command: string) {
