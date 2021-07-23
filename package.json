@@ -28,6 +28,6 @@
     "ioredis": "^4.27.6",
     "mustache": "^4.2.0",
     "sharp": "^0.28.3",
-    "telegraf": "^4.4.0"
+    "telegraf": "^4.4.1"
   }
 }
