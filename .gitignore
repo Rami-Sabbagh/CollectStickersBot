@@ -105,3 +105,12 @@ dist
 
 # Documentation
 docs
+
+# Yarn 2.0
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*

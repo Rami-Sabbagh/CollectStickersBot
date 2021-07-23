@@ -1,7 +1,7 @@
 {
-    "private": true,
-    "workspaces": ["telegram-bot"],
-    "scripts": {
-        "bot:dev": "yarn workspaces run bot:dev"
-    }
+  "name": "CollectStickersBot",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
 }

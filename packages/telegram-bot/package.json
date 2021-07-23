@@ -8,9 +8,9 @@
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
-    "bot:dev": "ts-node src/index.ts",
-    "bot:build": "tsc",
-    "bot:start": "node ."
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node ."
   },
   "devDependencies": {
     "@types/ioredis": "^4.26.6",
