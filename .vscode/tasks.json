@@ -3,10 +3,10 @@
 	"tasks": [
 		{
 			"type": "npm",
-			"script": "start",
+			"script": "bot:dev",
 			"problemMatcher": [],
-			"label": "npm: start",
-			"detail": "ts-node .",
+			"label": "bot: start (development)",
+			"detail": "yarn workspace bot dev",
 			"isBackground": true,
 			"presentation": {
 				"echo": true,
