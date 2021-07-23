@@ -1,0 +1,33 @@
+{
+  "name": "collect-stickers-bot",
+  "version": "1.8.0",
+  "description": "A Telegram bot for cloning stickers into your own stickers packs (collections).",
+  "main": "dist/index.js",
+  "repository": "https://github.com/Rami-Sabbagh/CollectStickersBot.git",
+  "author": "Rami Sabbagh <ramilego4game@gmail.com>",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "scripts": {
+    "bot:dev": "ts-node src/index.ts",
+    "bot:build": "tsc",
+    "bot:start": "node ."
+  },
+  "devDependencies": {
+    "@types/ioredis": "^4.26.6",
+    "@types/mustache": "^4.1.2",
+    "@types/node": "^16.4.1",
+    "@types/sharp": "^0.28.4",
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "chalk": "^4.1.1",
+    "dotenv": "^10.0.0",
+    "fast-csv": "^4.3.6",
+    "ioredis": "^4.27.6",
+    "mustache": "^4.2.0",
+    "sharp": "^0.28.3",
+    "telegraf": "^4.4.0"
+  }
+}
