@@ -2,7 +2,8 @@
   "name": "collect-stickers-bot",
   "private": true,
   "scripts": {
-    "bot:dev": "yarn workspace bot dev"
+    "bot:dev": "yarn workspace bot dev",
+    "api:dev": "yarn workspace api dev"
   },
   "workspaces": [
     "packages/*"
