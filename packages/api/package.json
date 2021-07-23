@@ -1,5 +1,5 @@
 {
-  "name": "dashboard-api",
+  "name": "api",
   "version": "1.0.0",
   "description": "A backend API for CollectStickersBot",
   "main": "index.js",

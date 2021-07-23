@@ -1,5 +1,5 @@
 {
-  "name": "collect-stickers-bot",
+  "name": "bot",
   "version": "1.8.0",
   "description": "A Telegram bot for cloning stickers into your own stickers packs (collections).",
   "main": "dist/index.js",
@@ -15,10 +15,7 @@
   "devDependencies": {
     "@types/ioredis": "^4.26.6",
     "@types/mustache": "^4.1.2",
-    "@types/node": "^16.4.1",
-    "@types/sharp": "^0.28.4",
-    "ts-node": "^10.1.0",
-    "typescript": "^4.3.5"
+    "@types/sharp": "^0.28.4"
   },
   "dependencies": {
     "axios": "^0.21.1",

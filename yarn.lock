@@ -118,12 +118,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"CollectStickersBot@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "CollectStickersBot@workspace:."
-  languageName: unknown
-  linkType: soft
-
 "abbrev@npm:1":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -193,6 +187,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"api@workspace:packages/api":
+  version: 0.0.0-use.local
+  resolution: "api@workspace:packages/api"
+  languageName: unknown
+  linkType: soft
+
 "aproba@npm:^1.0.3":
   version: 1.2.0
   resolution: "aproba@npm:1.2.0"
@@ -250,6 +250,24 @@ __metadata:
   checksum: 15d009339c2eeaedb9dab39c48f910a2fd6a9ba11400e61990917ebf3b25fa32cd9b80c7531a95467078258f6a59bd3f5d93323565423a7843855a16a1794261
   languageName: node
   linkType: hard
+
+"bot@workspace:packages/bot":
+  version: 0.0.0-use.local
+  resolution: "bot@workspace:packages/bot"
+  dependencies:
+    "@types/ioredis": ^4.26.6
+    "@types/mustache": ^4.1.2
+    "@types/sharp": ^0.28.4
+    axios: ^0.21.1
+    chalk: ^4.1.1
+    dotenv: ^10.0.0
+    fast-csv: ^4.3.6
+    ioredis: ^4.27.6
+    mustache: ^4.2.0
+    sharp: ^0.28.3
+    telegraf: ^4.4.0
+  languageName: unknown
+  linkType: soft
 
 "brace-expansion@npm:^1.1.7":
   version: 1.1.11
@@ -372,22 +390,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"collect-stickers-bot@workspace:packages/telegram-bot":
+"collect-stickers-bot@workspace:.":
   version: 0.0.0-use.local
-  resolution: "collect-stickers-bot@workspace:packages/telegram-bot"
+  resolution: "collect-stickers-bot@workspace:."
   dependencies:
-    "@types/ioredis": ^4.26.6
-    "@types/mustache": ^4.1.2
     "@types/node": ^16.4.1
-    "@types/sharp": ^0.28.4
-    axios: ^0.21.1
-    chalk: ^4.1.1
-    dotenv: ^10.0.0
-    fast-csv: ^4.3.6
-    ioredis: ^4.27.6
-    mustache: ^4.2.0
-    sharp: ^0.28.3
-    telegraf: ^4.4.0
     ts-node: ^10.1.0
     typescript: ^4.3.5
   languageName: unknown
@@ -472,12 +479,6 @@ __metadata:
   checksum: babd307893abfb26d77ae11cb9d6b6cfa6d18c9cee435cf70b5a3fb44aa8d90c9ec26ea89cbb16e0a94b8d34f5fcaee164b90ed526cdd3158955673ab9652d01
   languageName: node
   linkType: hard
-
-"dashboard-api@workspace:packages/dashboard-api":
-  version: 0.0.0-use.local
-  resolution: "dashboard-api@workspace:packages/dashboard-api"
-  languageName: unknown
-  linkType: soft
 
 "debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.3.1":
   version: 4.3.2
