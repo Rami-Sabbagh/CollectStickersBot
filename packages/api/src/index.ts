@@ -8,7 +8,7 @@ import Redis from 'ioredis';
 const app = express();
 const port = 3000;
 
-const redis = new Redis();
+const redis = new Redis(process.env.REDIS_URL, { keyPrefix: process.env.REDIS_PREFIX });
 
 app.get('/statistics', async (_, res) => {
     const stickers = await redis.hgetall('stickers_usage');
