@@ -1,4 +1,4 @@
-name: API package Continuous Integration
+name: API - CI
 on:
   push:
     branches:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   docker:
-    name: Build and push Docker image
+    name: Build Docker image
     runs-on: ubuntu-latest
 
     steps:

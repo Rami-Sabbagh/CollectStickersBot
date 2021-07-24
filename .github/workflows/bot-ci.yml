@@ -1,4 +1,4 @@
-name: Bot package Continuous Integration
+name: Bot - CI/CD
 on:
   push:
     branches:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   docker:
-    name: Build Docker image
+    name: Build and push Docker image
     runs-on: ubuntu-latest
 
     steps:
