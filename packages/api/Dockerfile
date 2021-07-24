@@ -37,5 +37,9 @@ WORKDIR /app
 # Copy the required files to run the project
 COPY --from=build /app/packages/api/dist ./packages/api/dist
 
+# Setup the API server port
+ENV API_PORT=3000
+EXPOSE 3000/tcp
+
 # Launch the bot
 CMD [ "yarn", "workspace", "api", "start" ]
