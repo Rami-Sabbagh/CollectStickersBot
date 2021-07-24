@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: '../../.env' });
+
 import chalk from 'chalk';
 import express from 'express';
 import Redis from 'ioredis';

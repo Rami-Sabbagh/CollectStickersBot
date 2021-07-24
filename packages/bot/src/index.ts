@@ -1,7 +1,7 @@
-import chalk from 'chalk';
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
+import chalk from 'chalk';
 import { Context, Telegraf } from 'telegraf';
 
 import redis from './redis';
