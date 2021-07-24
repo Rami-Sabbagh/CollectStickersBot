@@ -10,6 +10,11 @@ const port = Number.parseInt(process.env.API_PORT ?? '3000', 10);
 
 const redis = new Redis(process.env.REDIS_URL, { keyPrefix: process.env.REDIS_PREFIX });
 
+app.get('/', (_, res) => {
+    const endpoints = ['/statistics'];
+    res.send(`<ul>\n${endpoints.map((endpoint) => `<il>• <a href="${endpoints}">${endpoint}</a></il>`).join('\n')}\n</ul>`);
+});
+
 app.get('/statistics', async (_, res) => {
     const stickers = await redis.hgetall('stickers_usage');
 
