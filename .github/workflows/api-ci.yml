@@ -36,7 +36,7 @@ jobs:
         with:
           tags: ramisab/collect-stickers-bot/api:latest
           file: packages/api/Dockerfile
-          cache-from: type=local,src=/tmp/.buildx-cache-bot
+          cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
       - name: Image digest
