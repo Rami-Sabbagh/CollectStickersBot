@@ -145,16 +145,16 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:^16.4.1":
-  version: 16.4.1
-  resolution: "@types/node@npm:16.4.1"
-  checksum: 8b9fda74322631febbf084e3c7a26b799a3a1b8f45d6bbaedfb8943c7b3eb743aa2e41c04de6f5f87f63c99451f3ed0b37822614cbd42ed55c8c9c8f9462d231
+  version: 16.4.2
+  resolution: "@types/node@npm:16.4.2"
+  checksum: cc67dcab59476bc784d6e72d36de7b380bff38d897f77308a89030bad1703bbd10050d5c4d2233ea080b940ed96990e1f167a9efccc570bdff4add1e75cc047a
   languageName: node
   linkType: hard
 
 "@types/node@npm:^14.0.1":
-  version: 14.17.5
-  resolution: "@types/node@npm:14.17.5"
-  checksum: bd2c9bd617d36fea3b6380f5f7bbf56b59dbfb97ba5ff6d04fdf8ec47402ba4bb4cc902087a7f40d17c91845cc949c811a366679f3421a965e80fbce328a2750
+  version: 14.17.6
+  resolution: "@types/node@npm:14.17.6"
+  checksum: 4b2464f39d96be4fcdde7f4e8bb3c8b24e98ff908ca0cced997884d0dfbcc666b4b65a51b83dac92650508a1a2466e82eac2f926ddc3c0ae87bfff580dd324f6
   languageName: node
   linkType: hard
 
@@ -2141,8 +2141,8 @@ __metadata:
   linkType: hard
 
 "tar@npm:^6.0.2, tar@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "tar@npm:6.1.0"
+  version: 6.1.1
+  resolution: "tar@npm:6.1.1"
   dependencies:
     chownr: ^2.0.0
     fs-minipass: ^2.0.0
@@ -2150,13 +2150,13 @@ __metadata:
     minizlib: ^2.1.1
     mkdirp: ^1.0.3
     yallist: ^4.0.0
-  checksum: d1d988eceb1ad2ecfaaf6fc5ecfe0c46fa005d04fe4c283355ccc52d3ffb4b6bf459a62f9ac7e36fd35251ab020399bdf527ab48b968120e06b4f61906a87d62
+  checksum: 8743d0909109f5914d83db068170374a123da7069f15fbc3e4dc4ee12cdac3bcf5f3b5cd550e8b97d488d7cad3f63e756b5c22643f05d253e392432883846004
   languageName: node
   linkType: hard
 
 "telegraf@npm:^4.4.0":
-  version: 4.4.0
-  resolution: "telegraf@npm:4.4.0"
+  version: 4.4.1
+  resolution: "telegraf@npm:4.4.1"
   dependencies:
     abort-controller: ^3.0.0
     debug: ^4.3.1
@@ -2166,10 +2166,10 @@ __metadata:
     p-timeout: ^4.1.0
     safe-compare: ^1.1.4
     sandwich-stream: ^2.0.2
-    typegram: ^3.4.0
+    typegram: ^3.4.2
   bin:
     telegraf: bin/telegraf
-  checksum: 4a26718dd0d38d4d2e7468fe1637db99a6ab26e17f4204dcb466388d3a33c040bcbcc1fcf549ef7992b59006879ea7a98b1e0744d1bf7df6a849b552c641ac66
+  checksum: 673575a25041fb0ee723ace6fdd93c393a52b3a850eafa68757607ded2addd81dd7de3ebb02d6d8009d81e747d7a579c96c4bae3d51686c783ef5f617de0a218
   languageName: node
   linkType: hard
 
@@ -2233,7 +2233,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typegram@npm:^3.4.0":
+"typegram@npm:^3.4.2":
   version: 3.4.2
   resolution: "typegram@npm:3.4.2"
   checksum: ead71e5a108f8c51bb9bb2e8418d77d1d32d0fa9790ec52ca7b900c38069c336f5201d2b79c150d17f89aa14631641558cd0579690dc7e7e503e0f3fc7468d7e
