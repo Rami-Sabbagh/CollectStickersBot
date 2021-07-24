@@ -13,7 +13,7 @@ COPY .yarn ./.yarn
 # Install production dependencies
 RUN yarn workspaces focus bot --production
 
-# ##### BUILD #####
+##### BUILD #####
 
 FROM base as build
 

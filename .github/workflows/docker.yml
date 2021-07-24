@@ -27,7 +27,7 @@ jobs:
         with:
           push: true
           tags: ramisab/collect-stickers-bot:latest
-          file: ./package/bot/Dockerfile
+          file: packages/bot/Dockerfile
         
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
