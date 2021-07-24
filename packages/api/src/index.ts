@@ -12,7 +12,10 @@ const redis = new Redis(process.env.REDIS_URL, { keyPrefix: process.env.REDIS_PR
 
 app.get('/', (_, res) => {
     const endpoints = ['/statistics'];
-    res.send(`<ul>\n${endpoints.map((endpoint) => `<il>• <a href="${endpoints}">${endpoint}</a></il>`).join('\n')}\n</ul>`);
+
+    res.send(`<ul>\n${endpoints.map(
+        (endpoint) => `<il>• <a href="${endpoints}">${endpoint}</a></il>`
+    ).join('\n')}\n</ul>`);
 });
 
 app.get('/statistics', async (_, res) => {
