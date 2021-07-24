@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: packages/bot/Dockerfile
-    env_file: .env
+    env_file: packages/bot/.env
     environment:
       REDIS_URL: "redis://redis:6379"
     depends_on:
