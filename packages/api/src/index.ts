@@ -6,7 +6,7 @@ import express from 'express';
 import Redis from 'ioredis';
 
 const app = express();
-const port = 3000;
+const port = Number.parseInt(process.env.API_PORT ?? '3000', 10);
 
 const redis = new Redis(process.env.REDIS_URL, { keyPrefix: process.env.REDIS_PREFIX });
 
