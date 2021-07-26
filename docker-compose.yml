@@ -22,3 +22,8 @@ services:
       - redis
   redis:
     image: redis:alpine
+    volumes: 
+      - redis:/data
+
+volumes:
+  redis:
