@@ -1,4 +1,4 @@
-name: API - CI
+name: API - CI/CD
 on:
   push:
     branches:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   docker:
-    name: Build Docker image
+    name: Build and push Docker image
     runs-on: ubuntu-latest
 
     steps:
@@ -30,10 +30,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
-      - name: Build api image
+      - name: Build and push image
         id: docker_build
         uses: docker/build-push-action@v2
         with:
+          push: true
           tags: ramisab/collect-stickers-bot/api:latest
           file: packages/api/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
