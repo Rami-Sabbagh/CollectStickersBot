@@ -103,7 +103,7 @@ bot.on('photo', async (ctx) => {
         await increaseStickersCounter('image');
     } catch (error) {
         console.error(error);
-        response = ctx.localize('sticker_image_failure');
+        response = ctx.localize('stickers_image_failure');
     }
 
     await ctx.replyWithHTML(response);
