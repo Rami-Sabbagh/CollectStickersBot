@@ -10,14 +10,6 @@ const port = Number.parseInt(process.env.API_PORT ?? '3000', 10);
 
 const redis = new Redis(process.env.REDIS_URL, { keyPrefix: process.env.REDIS_PREFIX });
 
-app.get('/', (_, res) => {
-    const endpoints = ['/statistics'];
-
-    res.send(`<ul>\n${endpoints.map(
-        (endpoint) => `<il>• <a href="${endpoints}">${endpoint}</a></il>`
-    ).join('\n')}\n</ul>`);
-});
-
 app.get('/statistics', async (_, res) => {
     const stickers = await redis.hgetall('stickers_usage');
 
@@ -38,6 +30,47 @@ app.get('/statistics', async (_, res) => {
     };
 
     res.json(statistics);
+});
+
+app.get('/users/ids', async (_, res) => {
+    const rawIds = await redis.smembers('users');
+    const ids = rawIds.map((id) => Number.parseInt(id, 10));
+
+    res.json(ids);
+});
+
+app.get('/users/list', async (_, res) => {
+    const rawIds = await redis.smembers('users');
+    const ids = rawIds.map((id) => Number.parseInt(id, 10));
+
+    const users: Record<string, string | number>[] = [];
+    const pipeline = redis.pipeline();
+
+    ids.forEach((id) => pipeline.hgetall(`user:${id}`, (err, data: Record<string, string | number>) => {
+        if (err !== null) return console.error(`failed to fetch user (${id}):`, err);
+
+        Object.entries(data).forEach(([key, value]) => {
+            if (typeof value === 'string' && /^-?\d+$/.test(value))
+                data[key] = Number.parseInt(value, 10);
+        });
+
+        data['id'] = id;
+        users.push(data);
+    }));
+
+    await pipeline.exec();
+
+    res.json(users);
+});
+
+app.get('/user/:userId(-?\\d+)', async (req, res) => {
+    const { userId: rawId } = req.params;
+    const id = Number.parseInt(rawId, 10);
+
+    const key = `user:${id}`;
+
+    if (!await redis.exists(key)) res.sendStatus(404);
+    else res.json(await redis.hgetall(key));
 });
 
 async function main() {
