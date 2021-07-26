@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "bot:dev": "yarn workspace bot dev",
-    "api:dev": "yarn workspace api dev"
+    "api:dev": "yarn workspace api dev",
+    "web:dev": "yarn workspace web dev"
   },
   "workspaces": [
     "packages/*"

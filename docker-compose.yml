@@ -16,8 +16,9 @@ services:
     env_file: .env
     environment:
       REDIS_URL: "redis://redis:6379"
+      API_PORT: 4000
     ports:
-      - "3000:3000"
+      - "4000:4000"
     depends_on:
       - redis
   redis:
