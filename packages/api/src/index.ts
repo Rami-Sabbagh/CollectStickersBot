@@ -5,10 +5,14 @@ import chalk from 'chalk';
 import express from 'express';
 import Redis from 'ioredis';
 
+import cors from 'cors';
+
 const app = express();
 const port = Number.parseInt(process.env.API_PORT ?? '3000', 10);
 
 const redis = new Redis(process.env.REDIS_URL, { keyPrefix: process.env.REDIS_PREFIX });
+
+app.use(cors());
 
 app.get('/statistics', async (_, res) => {
     const stickers = await redis.hgetall('stickers_usage');
