@@ -184,7 +184,7 @@ export async function createStickerFromImage(ctx: Context, photos: PhotoSize[]):
     const photoBuffer = Buffer.from(photoResponse.data);
     const stickerBuffer = await sharp(photoBuffer)
         .resize(512, 512, { fit: 'inside' })
-        .png().toBuffer();
+        .png({ compressionLevel: 9 }).toBuffer();
 
     return addStickerToCollections(ctx, '🖼', { source: stickerBuffer });
 }
