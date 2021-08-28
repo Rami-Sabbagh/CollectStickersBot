@@ -4,6 +4,8 @@ dotenv.config({ path: '../../.env' });
 import chalk from 'chalk';
 import { Context, Telegraf } from 'telegraf';
 
+import * as fs from 'fs';
+
 import redis from './redis';
 import UserProfile from './user-profile';
 
@@ -16,9 +18,13 @@ interface MyContext extends Context {
     localize(string_id: string, view?: Record<string, any>): string;
 }
 
-if (process.env.BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set ⚠');
+let BOT_TOKEN: string | undefined = process.env.BOT_TOKEN;
+if (BOT_TOKEN === undefined) throw new Error('"BOT_TOKEN" is not set ⚠');
 
-const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN);
+if (BOT_TOKEN.startsWith('/') || BOT_TOKEN.startsWith('\\'))
+    BOT_TOKEN = fs.readFileSync(BOT_TOKEN, 'utf-8');
+
+const bot = new Telegraf<MyContext>(BOT_TOKEN);
 
 async function sendLanguagesMenu(ctx: MyContext) {
     await ctx.reply(ctx.localize('language_select'), {
