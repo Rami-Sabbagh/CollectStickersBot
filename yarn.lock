@@ -475,7 +475,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^16.4.1, @types/node@npm:^16.4.3":
+"@types/node@npm:*, @types/node@npm:^16.7.4":
   version: 16.7.4
   resolution: "@types/node@npm:16.7.4"
   checksum: da7813e6c37e7813645a9d40de6d9f803fbadb2975748d307ec31d8e4f9baabccf49b667a39e4b1288d477ec7d34a339e8a41d8703a1d7ab0ec8eb2516073f27
@@ -696,7 +696,6 @@ __metadata:
     dotenv: ^10.0.0
     express: ^4.17.1
     ioredis: ^4.27.8
-    typescript: ^4.3.5
   languageName: unknown
   linkType: soft
 
@@ -874,7 +873,6 @@ __metadata:
     mustache: ^4.2.0
     sharp: ^0.29.0
     telegraf: ^4.4.0
-    typescript: ^4.3.5
   languageName: unknown
   linkType: soft
 
@@ -1224,9 +1222,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "collect-stickers-bot@workspace:."
   dependencies:
-    "@types/node": ^16.4.1
+    "@types/node": ^16.7.4
     ts-node: ^10.2.1
-    typescript: ^4.3.5
+    typescript: ^4.4.2
   languageName: unknown
   linkType: soft
 
@@ -4694,7 +4692,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-typescript@^4.3.5:
+typescript@^4.4.2:
   version: 4.4.2
   resolution: "typescript@npm:4.4.2"
   bin:
@@ -4704,7 +4702,7 @@ typescript@^4.3.5:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.3.5#~builtin<compat/typescript>":
+"typescript@patch:typescript@^4.4.2#~builtin<compat/typescript>":
   version: 4.4.2
   resolution: "typescript@patch:typescript@npm%3A4.4.2#~builtin<compat/typescript>::version=4.4.2&hash=d8b4e7"
   bin:
@@ -4862,13 +4860,11 @@ typescript@^4.3.5:
   dependencies:
     "@material-ui/core": ^4.12.3
     "@material-ui/icons": ^4.11.2
-    "@types/node": ^16.4.3
     "@types/react": ^17.0.19
     axios: ^0.21.1
     next: ^11.1.0
     react: ^17.0.2
     react-dom: ^17.0.2
-    typescript: ^4.3.5
   languageName: unknown
   linkType: soft
 
