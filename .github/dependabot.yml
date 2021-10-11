@@ -5,13 +5,6 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    reviewers:
-      - "rami-sabbagh"
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
